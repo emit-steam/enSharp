@@ -6,14 +6,18 @@ import 'package:http/http.dart' as http;
 
 class ContactBloc extends ChangeNotifier {
   final _notifiers = <ValueNotifier>[];
-  final contactListNotifier = ValueNotifier<List<ContactModel>>([]);
-  final screenStateNotifier = ValueNotifier<ScreenStateType>(ScreenStateType.placeholder);
+  final contactListNotifier = ValueNotifier<List<ContactModel>>([]); // 주소록 정보 리스트
+  final screenStateNotifier = ValueNotifier<ScreenStateType>(ScreenStateType.placeholder); // api state 여부
+  final yearListNotifier = ValueNotifier<List<String>>([]); // 기수 리스트
+  final selectYearNotifier = ValueNotifier<String>(''); // 배고픔 호소 선택한 기수
 
   ContactBloc() {
     _notifiers
       ..addAll([
         contactListNotifier,
         screenStateNotifier,
+        yearListNotifier,
+        selectYearNotifier,
       ])
       ..forEach(
         (element) {
@@ -27,9 +31,27 @@ class ContactBloc extends ChangeNotifier {
     getContactList().then(
       (value) {
         contactListNotifier.value = value;
+
+        yearListNotifier.value = value
+            .map(
+              (e) {
+                return e.year;
+              },
+            )
+            .toSet()
+            .toList();
+
+        ///// 전체를 default select year로 한다
+        yearListNotifier.value.insert(0, '전체');
+        setSelectYear(selectYear: yearListNotifier.value[0]);
+
         screenStateNotifier.value = ScreenStateType.success;
       },
     );
+  }
+
+  void setSelectYear({String selectYear}) {
+    selectYearNotifier.value = selectYear;
   }
 
   Future<List<ContactModel>> getContactList() async {

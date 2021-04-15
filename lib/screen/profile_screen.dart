@@ -104,7 +104,7 @@ class ProfileScreen extends StatelessWidget {
                           ///// 보이스피싱
                           GestureDetector(
                             onTap: () {
-                              Navigator.of(context).pop();
+                              launch('tel://${contactModel.phoneNumber}');
                             },
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
